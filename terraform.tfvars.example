@@ -1,0 +1,2 @@
+# Copy to terraform.tfvars and edit to override the defaults in variables.tf.
+# region = "us-east-1"

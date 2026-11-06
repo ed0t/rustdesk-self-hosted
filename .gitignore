@@ -1,0 +1,16 @@
+# State files contain sensitive infrastructure details (AWS account ID, IPs, ARNs)
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.*
+
+# Downloaded provider plugins
+.terraform/
+
+# Sensitive variable files
+*.tfvars
+*.tfvars.json
+
+# Local cache and generated files (client-setup.sh contains a password)
+.rustdesk/
+out/
