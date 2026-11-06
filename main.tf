@@ -23,7 +23,7 @@ resource "aws_lightsail_instance" "rustdesk_server" {
               #!/bin/bash
               # Install Docker
               apt-get update
-              apt-get install -y docker.io docker-compose
+              apt-get install -y docker.io docker-compose-v2
               
               # Setup directory
               mkdir -p /home/ubuntu/rustdesk
@@ -43,14 +43,14 @@ resource "aws_lightsail_instance" "rustdesk_server" {
                 hbbr:
                   container_name: hbbr
                   image: rustdesk/rustdesk-server:${var.rustdesk_server_version}
-                  command: hbbr
+                  command: hbbr -k _
                   volumes:
                     - ./data:/root
                   network_mode: "host"
                   restart: unless-stopped
               EOT
               
-              sudo docker-compose up -d
+              docker compose up -d
               EOF
 
   # user_data only runs on first boot; changing it would replace the

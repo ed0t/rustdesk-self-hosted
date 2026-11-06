@@ -10,6 +10,7 @@ Self-hosted RustDesk server on AWS Lightsail, driven by Terraform and a bash CLI
 - `client/client-setup.ps1`: the body of the Windows setup. `rd client-setup` (`write_windows_setup`) wraps it in a `.cmd` with a batch header that elevates through UAC, then runs the PowerShell after the `##PS#` marker. Output has CRLF line endings. It runs on Windows PowerShell 5.1, so no PowerShell 7-only syntax (`??`, `?.`, ternary operators).
 - Neither body may define `SERVER_IP`/`$ServerIp`, `SERVER_KEY`/`$ServerKey` or `RD_PASSWORD`/`$RdPassword` itself.
 - `Brewfile`: the tools `rd` needs. Keep it in sync with the prerequisite check in `cmd_setup`.
+- Servers created before Compose v2 run the old `docker-compose` (v1), which crashes with `KeyError: 'ContainerConfig'` when recreating a container. Remove the container first: `sudo docker rm -f hbbr && sudo docker-compose up -d hbbr`.
 - `server/install-autostop.sh`: piped over SSH by `rd autostop` and run as root on the server. It installs a systemd timer that powers off after N idle minutes.
 
 ## Rules
