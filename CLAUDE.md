@@ -9,6 +9,7 @@ Self-hosted RustDesk server on AWS Lightsail, driven by Terraform and a bash CLI
 - `client/client-setup.sh`: the body of the macOS/Linux setup. `rd client-setup` prepends `SERVER_IP`, `SERVER_KEY` and `RD_PASSWORD` to it and writes it out as `rustdesk-setup-linux.sh` and `rustdesk-setup-mac.command`. When it's started from a file manager with no terminal, it reopens itself in one.
 - `client/client-setup.ps1`: the body of the Windows setup. `rd client-setup` (`write_windows_setup`) wraps it in a `.cmd` with a batch header that elevates through UAC, then runs the PowerShell after the `##PS#` marker. Output has CRLF line endings. It runs on Windows PowerShell 5.1, so no PowerShell 7-only syntax (`??`, `?.`, ternary operators).
 - Neither body may define `SERVER_IP`/`$ServerIp`, `SERVER_KEY`/`$ServerKey` or `RD_PASSWORD`/`$RdPassword` itself.
+- `Brewfile`: the tools `rd` needs. Keep it in sync with the prerequisite check in `cmd_setup`.
 - `server/install-autostop.sh`: piped over SSH by `rd autostop` and run as root on the server. It installs a systemd timer that powers off after N idle minutes.
 
 ## Rules

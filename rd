@@ -74,9 +74,17 @@ ssh_server() {
 }
 
 cmd_setup() {
+  local bin missing=""
   for bin in terraform aws jq nc ssh; do
-    command -v "$bin" >/dev/null || die "Missing '$bin'. See Prerequisites in README.md."
+    command -v "$bin" >/dev/null || missing="$missing $bin"
   done
+  if [ -n "$missing" ]; then
+    echo "Missing:$missing" >&2
+    if command -v brew >/dev/null; then
+      die "Install them with: brew bundle --file=\"$ROOT/Brewfile\""
+    fi
+    die "See Prerequisites in README.md."
+  fi
   aws sts get-caller-identity >/dev/null || die "AWS credentials not working. Run 'aws configure' or set AWS_PROFILE."
   tf init -input=false >/dev/null
   tf apply

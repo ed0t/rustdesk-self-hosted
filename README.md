@@ -6,12 +6,15 @@ A private [RustDesk](https://rustdesk.com) server for remotely helping family an
 
 ### Prerequisites
 
-On your own computer (**macOS or Linux**):
+On your own computer: **macOS**, **Linux**, or **Windows with [WSL](https://learn.microsoft.com/windows/wsl/install)**. On Windows, run `wsl --install` in PowerShell, then follow the Linux steps inside the Ubuntu window. The person you support needs none of this.
 
 - An **AWS account**.
-- The **AWS CLI**, logged in: `aws configure`, or `aws configure sso`, or a named profile with `export AWS_PROFILE=<name>`. The credentials need Lightsail permissions (`lightsail:*`).
-- **Terraform** 1.5 or newer.
-- `bash`, `jq`, `nc` and `ssh` (preinstalled on macOS and most Linux distros, apart from `jq`: `brew install jq` / `apt install jq`).
+- **Terraform** 1.5+, the **AWS CLI**, `jq` and `nc`. With [Homebrew](https://brew.sh), install them all from the repo folder:
+  ```bash
+  brew bundle
+  ```
+  Or install them however you prefer. `bash`, `ssh` and `curl` come with every system.
+- The AWS CLI logged in: `aws configure`, or `aws configure sso`, or a named profile with `export AWS_PROFILE=<name>`. The credentials need Lightsail permissions (`lightsail:*`).
 
 ### Create the server
 
