@@ -5,7 +5,7 @@ description: Operate this repo's self-hosted RustDesk server on AWS Lightsail wi
 
 # RustDesk server operations
 
-Everything goes through `./rd` in the repo root. Run `./rd` with no arguments for usage. It uses the user's normal AWS credentials; if a command fails with an auth error, ask which `AWS_PROFILE` to use rather than guessing.
+Everything goes through `./rd` in the repo root. Run `./rd` with no arguments for usage. It uses the user's normal AWS credentials; if a command fails with an auth error, ask which profile to use rather than guessing, and offer to save it as `AWS_PROFILE=<name>` in `.env` (gitignored, read by `rd`).
 
 ## Map requests to commands
 

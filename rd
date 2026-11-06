@@ -13,12 +13,18 @@
 #                       power the server off after this many idle minutes
 #
 # Uses your normal AWS credentials (AWS_PROFILE, env vars or the default profile).
+# Settings such as AWS_PROFILE=<name> can go in a .env file next to this script.
 # AUTOSTOP_MINUTES (default 60) sets the idle limit installed by setup.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 CACHE_DIR="$ROOT/.rustdesk"
 KEY_CACHE="$CACHE_DIR/server.pub"
+
+# Per-user settings (e.g. AWS_PROFILE); gitignored.
+if [ -f "$ROOT/.env" ]; then
+  set -a; . "$ROOT/.env"; set +a
+fi
 
 die() { echo "$*" >&2; exit 1; }
 
@@ -30,6 +36,8 @@ tf_output() {
 
 # Read once per run; every command except setup needs them.
 load_outputs() {
+  aws sts get-caller-identity >/dev/null 2>&1 ||
+    die "AWS credentials not found. Put AWS_PROFILE=<your-profile> in $ROOT/.env, or run 'aws configure'."
   REGION="$(tf_output region)"
   INSTANCE="$(tf_output instance_name)"
   SERVER_IP="$(tf_output rustdesk_server_ip)"
@@ -237,5 +245,5 @@ case "$cmd" in
   ssh) load_outputs; ssh_server "$@" ;;
   client-setup) load_outputs; cmd_client_setup ;;
   autostop) load_outputs; cmd_autostop "${1:-}" ;;
-  *) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  *) sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

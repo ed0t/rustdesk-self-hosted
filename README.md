@@ -14,7 +14,11 @@ On your own computer: **macOS**, **Linux**, or **Windows with [WSL](https://lear
   brew bundle
   ```
   Or install them however you prefer. `bash`, `ssh` and `curl` come with every system.
-- The AWS CLI logged in: `aws configure`, or `aws configure sso`, or a named profile with `export AWS_PROFILE=<name>`. The credentials need Lightsail permissions (`lightsail:*`).
+- The AWS CLI logged in: `aws configure`, or `aws configure sso`. To use a named profile, put it in a `.env` file in the repo folder (gitignored):
+  ```bash
+  echo 'AWS_PROFILE=<your-profile>' > .env
+  ```
+  The credentials need Lightsail permissions (`lightsail:*`).
 
 ### Create the server
 

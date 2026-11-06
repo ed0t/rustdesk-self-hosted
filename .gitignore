@@ -13,4 +13,5 @@ terraform.tfstate.backup
 
 # Local cache and generated files (client-setup.sh contains a password)
 .rustdesk/
+.env
 out/
