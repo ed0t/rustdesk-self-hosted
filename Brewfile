@@ -1,4 +1,4 @@
-# Tools ./rd needs on your machine (macOS, Linux or Windows via WSL).
+# Tools ./rdesk needs on your machine (macOS, Linux or Windows via WSL).
 # Install with: brew bundle
 tap "hashicorp/tap"
 brew "hashicorp/tap/terraform"   # not in homebrew-core since its licence change

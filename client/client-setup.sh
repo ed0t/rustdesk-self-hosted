@@ -1,5 +1,5 @@
 # Body of the client setup script (macOS and Linux). Don't run this file
-# directly: ./rd client-setup prepends SERVER_IP, SERVER_KEY and RD_PASSWORD.
+# directly: ./rdesk client-setup prepends SERVER_IP, SERVER_KEY and RD_PASSWORD.
 #
 # Installs RustDesk (if missing), points it at the private server and enables
 # unattended access with a permanent password. On Linux it also switches to

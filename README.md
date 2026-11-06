@@ -1,6 +1,6 @@
 # RustDesk Self-Hosted on AWS Lightsail
 
-A private [RustDesk](https://rustdesk.com) server for remotely helping family and friends, on the smallest AWS Lightsail instance. One script (`./rd`) creates it, turns it on and off, and generates a double-click setup file for the Windows, Linux or Mac computer you support.
+A private [RustDesk](https://rustdesk.com) server for remotely helping family and friends, on the smallest AWS Lightsail instance. One script (`./rdesk`) creates it, turns it on and off, and generates a double-click setup file for the Windows, Linux or Mac computer you support.
 
 > Not affiliated with or endorsed by RustDesk. This repo only automates deploying the official open-source [RustDesk server](https://github.com/rustdesk/rustdesk-server) and [client](https://github.com/rustdesk/rustdesk).
 
@@ -32,16 +32,21 @@ On your own computer: **macOS**, **Linux**, or **Windows with [WSL](https://lear
    Defaults are in [`variables.tf`](variables.tf) (`eu-west-2`, London).
 3. Create the server:
    ```bash
-   ./rd setup
+   ./rdesk setup
    ```
-   Terraform shows what it will create and asks you to confirm. The first boot installs Docker and RustDesk, which takes a few minutes; `setup` waits, prints the **server IP** and **key**, and turns on [auto-shutdown](#auto-shutdown) (60 idle minutes; set `AUTOSTOP_MINUTES=90 ./rd setup` to change it).
+   Terraform shows what it will create and asks you to confirm. The first boot installs Docker and RustDesk, which takes a few minutes; `setup` waits, prints the **server IP** and **key**, and turns on [auto-shutdown](#auto-shutdown) (60 idle minutes; set `AUTOSTOP_MINUTES=90 ./rdesk setup` to change it).
 4. In RustDesk on your own computer, go to **Settings → Network → ID/Relay server**, enter the IP as the ID server and paste the key.
 5. Turn the server off until you need it:
    ```bash
-   ./rd off
+   ./rdesk off
    ```
+6. Optionally, make `rdesk` available from any folder:
+   ```bash
+   ./rdesk install
+   ```
+   This symlinks it into `/usr/local/bin`, or `~/.local/bin` if that isn't writable (pass a folder to choose). The installed command always manages the server in this repo folder. `./rdesk uninstall` removes it. The examples below use `./rdesk`; once installed, plain `rdesk` works too.
 
-> Terraform state is kept locally in `terraform.tfstate` (gitignored). Don't lose it: it's how `./rd` finds your server and how `./rd destroy` knows what to delete.
+> Terraform state is kept locally in `terraform.tfstate` (gitignored). Don't lose it: it's how `./rdesk` finds your server and how `./rdesk destroy` knows what to delete.
 
 ---
 
@@ -52,26 +57,26 @@ On your own computer: **macOS**, **Linux**, or **Windows with [WSL](https://lear
 The recommended workflow is to turn the server **on** only when someone needs help, and **off** when you're done. A stopped server isn't exposed to the internet, and auto-shutdown (below) catches the times you forget.
 
 ```bash
-./rd on        # start the server and wait until RustDesk is reachable (1–3 min)
-./rd off       # stop it when you're done
-./rd status    # state, IP and remaining CPU burst capacity
+./rdesk on        # start the server and wait until RustDesk is reachable (1–3 min)
+./rdesk off       # stop it when you're done
+./rdesk status    # state, IP and remaining CPU burst capacity
 ```
 
-**Cost:** the default plan (`nano_3_0`, 512 MB RAM, 2 vCPUs, public IPv4) is **$5/month**. The static IP is included, and the plan is billed the same whether the server is on or off. Prices are from [Lightsail pricing](https://aws.amazon.com/lightsail/pricing/) as of November 2026. `./rd destroy` stops all charges.
+**Cost:** the default plan (`nano_3_0`, 512 MB RAM, 2 vCPUs, public IPv4) is **$5/month**. The static IP is included, and the plan is billed the same whether the server is on or off. Prices are from [Lightsail pricing](https://aws.amazon.com/lightsail/pricing/) as of November 2026. `./rdesk destroy` stops all charges.
 
 To see the server key again at any time (it's cached in `.rustdesk/`, so this works while the server is off):
 
 ```bash
-./rd key
+./rdesk key
 ```
 
 #### Auto-shutdown
 
-If you forget `./rd off`, the server powers itself off after **60 minutes** with no relay or SSH connection. To change or disable it (the server must be on):
+If you forget `./rdesk off`, the server powers itself off after **60 minutes** with no relay or SSH connection. To change or disable it (the server must be on):
 
 ```bash
-./rd autostop 120   # minutes
-./rd autostop off
+./rdesk autostop 120   # minutes
+./rdesk autostop off
 ```
 
 Sessions that RustDesk connects **directly** between the two computers don't pass through the server, so it can't see them. They keep working after it shuts down. Sessions going through the relay keep it awake.
@@ -85,7 +90,7 @@ You're usually not there in person, so you send them one file that they open. It
 **Step 1: generate the files (your machine)**
 
 ```bash
-./rd client-setup
+./rdesk client-setup
 ```
 
 It asks for a permanent password for that computer and writes three files to `out/`, with the server IP, key and password filled in:
@@ -116,7 +121,7 @@ What else it does on each system:
 - **Linux:** enables the RustDesk background service and turns off screen blanking and automatic suspend (GNOME). It also switches the login session from Wayland to Xorg when Xorg is installed, because RustDesk can't reliably control the mouse on Wayland: that shows up as a black screen or no control. Newer distros such as Ubuntu 25.10+ no longer ship Xorg, so there they may have to approve a screen-sharing prompt instead. **They should restart the computer** afterwards.
 - **Mac:** turns off system sleep, then opens **System Settings → Privacy & Security** twice. macOS only lets them grant these two permissions by hand: **Accessibility** (to control the mouse and keyboard) and **Screen Recording** (to see the screen). They switch RustDesk **on** in both. If RustDesk asks to install or start its service, they click **Install/Start**.
 
-Running the file again is safe. It skips the install and just reapplies the settings, which is handy after you `./rd destroy` and `./rd setup` again (new key) or change the password.
+Running the file again is safe. It skips the install and just reapplies the settings, which is handy after you `./rdesk destroy` and `./rdesk setup` again (new key) or change the password.
 
 #### Doing it by hand instead
 
@@ -131,11 +136,11 @@ If the file fails, or you'd rather do it yourself once you're connected:
 
 ### 3. Connecting
 
-1. `./rd on`.
+1. `./rdesk on`.
 2. Open RustDesk on your computer (already pointed at your server during installation).
 3. Enter their RustDesk ID.
 4. Enter the permanent password: you're connected without them having to accept.
-5. `./rd off` when you're done.
+5. `./rdesk off` when you're done.
 
 ### 4. Connecting from your phone
 
@@ -159,7 +164,7 @@ On iPhone, Apple only allows viewing the screen, not controlling it. On Android:
 ### 6. Removing everything
 
 ```bash
-./rd destroy
+./rdesk destroy
 ```
 
 This deletes the instance and static IP, so AWS stops billing you for them. The server key is gone too: if you set up again, every client needs the new IP and key.
@@ -172,15 +177,17 @@ This deletes the instance and static IP, so AWS stops billing you for them. The 
 
 | Command | What it does |
 |---|---|
-| `./rd setup` | Create the server with Terraform (safe to re-run: starts a stopped server and keeps your auto-shutdown setting) |
-| `./rd on` | Start the server and wait until RustDesk is reachable |
-| `./rd off` | Stop the server |
-| `./rd status` | State, IP and remaining CPU burst capacity |
-| `./rd key` | Print the server key (cached, works while off) |
-| `./rd ssh [cmd]` | Shell on the server, using temporary Lightsail credentials (no key pair to manage) |
-| `./rd client-setup` | Generate double-click setup files for the computer you support (Windows, Linux, macOS) |
-| `./rd autostop <minutes\|off>` | Change or disable auto-shutdown |
-| `./rd destroy` | Delete the server and static IP |
+| `./rdesk setup` | Create the server with Terraform (safe to re-run: starts a stopped server and keeps your auto-shutdown setting) |
+| `./rdesk on` | Start the server and wait until RustDesk is reachable |
+| `./rdesk off` | Stop the server |
+| `./rdesk status` | State, IP and remaining CPU burst capacity |
+| `./rdesk key` | Print the server key (cached, works while off) |
+| `./rdesk ssh [cmd]` | Shell on the server, using temporary Lightsail credentials (no key pair to manage) |
+| `./rdesk client-setup` | Generate double-click setup files for the computer you support (Windows, Linux, macOS) |
+| `./rdesk autostop <minutes\|off>` | Change or disable auto-shutdown |
+| `./rdesk destroy` | Delete the server and static IP |
+| `./rdesk install [dir]` | Symlink `rdesk` onto your PATH (`/usr/local/bin` or `~/.local/bin`) |
+| `./rdesk uninstall [dir]` | Remove that symlink |
 
 ### How it works
 
@@ -192,7 +199,7 @@ Edits to the boot script (`user_data`) are deliberately ignored after creation. 
 
 ### Using with Claude Code
 
-The repo includes a [Claude Code](https://claude.com/claude-code) skill (`.claude/skills/rustdesk`). Open Claude Code in this folder and ask things like "turn on the server", "set up my mum's Mac" or "I get a black screen when I connect". It runs the right `./rd` commands, asks before anything that creates or deletes resources, and leaves password entry to you.
+The repo includes a [Claude Code](https://claude.com/claude-code) skill (`.claude/skills/rustdesk`). Open Claude Code in this folder and ask things like "turn on the server", "set up my mum's Mac" or "I get a black screen when I connect". It runs the right `./rdesk` commands, asks before anything that creates or deletes resources, and leaves password entry to you.
 
 ## License
 

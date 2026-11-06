@@ -1,5 +1,5 @@
 # Installs (or removes) auto-shutdown on the RustDesk server. Run as root via
-# ./rd autostop, which pipes this file over ssh:  bash -s -- <minutes|off>
+# ./rdesk autostop, which pipes this file over ssh:  bash -s -- <minutes|off>
 #
 # The server powers itself off after <minutes> without any relay (TCP 21117)
 # or SSH connection. Direct RustDesk sessions don't pass through the server
@@ -22,7 +22,7 @@ esac
 
 cat > /usr/local/bin/rustdesk-autostop <<EOF
 #!/bin/bash
-# Power off after $MINUTES idle minutes. Installed by ./rd autostop.
+# Power off after $MINUTES idle minutes. Installed by ./rdesk autostop.
 set -eu
 LIMIT=\$(( $MINUTES * 60 ))
 STAMP=/run/rustdesk-autostop.last   # tmpfs: reset on every boot

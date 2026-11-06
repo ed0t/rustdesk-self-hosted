@@ -1,4 +1,4 @@
-# Body of the Windows setup. Don't run this file directly: ./rd client-setup
+# Body of the Windows setup. Don't run this file directly: ./rdesk client-setup
 # wraps it in a double-clickable .cmd that runs it elevated, with $ServerIp,
 # $ServerKey and $RdPassword defined above it.
 #

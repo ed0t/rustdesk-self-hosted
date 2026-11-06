@@ -93,7 +93,7 @@ resource "aws_lightsail_instance_public_ports" "rustdesk_firewall" {
   }
 }
 
-# Outputs read by ./rd and used in your RustDesk client
+# Outputs read by ./rdesk and used in your RustDesk client
 output "rustdesk_server_ip" {
   value = aws_lightsail_static_ip.rustdesk_ip.ip_address
 }
