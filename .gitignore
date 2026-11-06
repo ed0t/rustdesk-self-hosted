@@ -4,8 +4,9 @@ terraform.tfstate.backup
 *.tfstate
 *.tfstate.*
 
-# Downloaded provider plugins
+# Downloaded provider plugins and their lock file (versions are bounded in main.tf)
 .terraform/
+.terraform.lock.hcl
 
 # Sensitive variable files
 *.tfvars

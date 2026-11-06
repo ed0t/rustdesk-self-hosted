@@ -34,7 +34,7 @@ resource "aws_lightsail_instance" "rustdesk_server" {
               services:
                 hbbs:
                   container_name: hbbs
-                  image: rustdesk/rustdesk-server:latest
+                  image: rustdesk/rustdesk-server:${var.rustdesk_server_version}
                   command: hbbs -r ${aws_lightsail_static_ip.rustdesk_ip.ip_address}:21117
                   volumes:
                     - ./data:/root
@@ -42,7 +42,7 @@ resource "aws_lightsail_instance" "rustdesk_server" {
                   restart: unless-stopped
                 hbbr:
                   container_name: hbbr
-                  image: rustdesk/rustdesk-server:latest
+                  image: rustdesk/rustdesk-server:${var.rustdesk_server_version}
                   command: hbbr
                   volumes:
                     - ./data:/root

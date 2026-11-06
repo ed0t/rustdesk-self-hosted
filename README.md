@@ -2,6 +2,8 @@
 
 A private [RustDesk](https://rustdesk.com) server for remotely helping family and friends, on the smallest AWS Lightsail instance. One script (`./rd`) creates it, turns it on and off, and generates a double-click setup file for the Windows, Linux or Mac computer you support.
 
+> Not affiliated with or endorsed by RustDesk. This repo only automates deploying the official open-source [RustDesk server](https://github.com/rustdesk/rustdesk-server) and [client](https://github.com/rustdesk/rustdesk).
+
 ## Installation
 
 ### Prerequisites
@@ -47,7 +49,7 @@ On your own computer: **macOS**, **Linux**, or **Windows with [WSL](https://lear
 
 ### 1. Managing the server
 
-The cheapest Lightsail plan runs on **burst CPU credits**. Left on 24/7 and open to the internet, bot traffic can drain them and the server freezes. So the recommended workflow is to turn the server **on** only when someone needs help, and **off** when you're done.
+The recommended workflow is to turn the server **on** only when someone needs help, and **off** when you're done. A stopped server isn't exposed to the internet, and auto-shutdown (below) catches the times you forget.
 
 ```bash
 ./rd on        # start the server and wait until RustDesk is reachable (1–3 min)
@@ -55,7 +57,7 @@ The cheapest Lightsail plan runs on **burst CPU credits**. Left on 24/7 and open
 ./rd status    # state, IP and remaining CPU burst capacity
 ```
 
-While stopped you still pay the plan's base price, because AWS keeps the disk and static IP reserved, but the burst credits recharge to 100%. Check current [Lightsail pricing](https://aws.amazon.com/lightsail/pricing/).
+**Cost:** the default plan (`nano_3_0`, 512 MB RAM, 2 vCPUs, public IPv4) is **$5/month**. The static IP is included, and the plan is billed the same whether the server is on or off. Prices are from [Lightsail pricing](https://aws.amazon.com/lightsail/pricing/) as of November 2026. `./rd destroy` stops all charges.
 
 To see the server key again at any time (it's cached in `.rustdesk/`, so this works while the server is off):
 
@@ -75,6 +77,8 @@ If you forget `./rd off`, the server powers itself off after **60 minutes** with
 Sessions that RustDesk connects **directly** between the two computers don't pass through the server, so it can't see them. They keep working after it shuts down. Sessions going through the relay keep it awake.
 
 ### 2. Setting up the computer you support (Windows, Linux or Mac)
+
+> 🧪 **Experimental.** The client setup files are new and haven't been tested on every system and version. If one fails or something is unclear, please [open an issue](../../issues): feedback is very welcome. If a file doesn't work, use the [manual steps](#doing-it-by-hand-instead) below.
 
 You're usually not there in person, so you send them one file that they open. It installs RustDesk if it isn't there yet, points it at your server and sets a permanent password, so you can connect without them clicking "Accept".
 
@@ -114,7 +118,7 @@ What else it does on each system:
 
 Running the file again is safe. It skips the install and just reapplies the settings, which is handy after you `./rd destroy` and `./rd setup` again (new key) or change the password.
 
-**Doing it by hand instead**
+#### Doing it by hand instead
 
 If the file fails, or you'd rather do it yourself once you're connected:
 
@@ -168,7 +172,7 @@ This deletes the instance and static IP, so AWS stops billing you for them. The 
 
 | Command | What it does |
 |---|---|
-| `./rd setup` | Create the server with Terraform (safe to re-run) |
+| `./rd setup` | Create the server with Terraform (safe to re-run: starts a stopped server and keeps your auto-shutdown setting) |
 | `./rd on` | Start the server and wait until RustDesk is reachable |
 | `./rd off` | Stop the server |
 | `./rd status` | State, IP and remaining CPU burst capacity |

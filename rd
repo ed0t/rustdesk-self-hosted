@@ -98,11 +98,17 @@ cmd_setup() {
   tf apply
   load_outputs
   rm -f "$KEY_CACHE"
-  wait_for "RustDesk to finish installing (first boot takes a few minutes)" 120 port_open "$SERVER_IP" 21116
+  echo "Starting the server (the first boot installs RustDesk and takes a few minutes)."
+  cmd_on 120
   echo
   echo "Server IP: $SERVER_IP"
   printf 'Key:       '; cmd_key
-  cmd_autostop "${AUTOSTOP_MINUTES:-60}"
+  # On a re-run, keep whatever limit was set with ./rd autostop.
+  if [ -n "${AUTOSTOP_MINUTES:-}" ] || ! ssh_server 'test -x /usr/local/bin/rustdesk-autostop'; then
+    cmd_autostop "${AUTOSTOP_MINUTES:-60}"
+  else
+    echo "Auto-shutdown: keeping the current setting (change it with ./rd autostop)."
+  fi
   echo
   echo "Next: './rd client-setup' for the computer you support, then './rd off' when you're done."
 }
@@ -115,15 +121,16 @@ cmd_destroy() {
   rm -rf "$CACHE_DIR"
 }
 
+# $1: how many 5-second attempts to wait for RustDesk (default 5 minutes).
 cmd_on() {
-  local s
+  local s tries="${1:-60}"
   s="$(state)"
   if [ "$s" != running ]; then
     if [ "$s" = stopping ]; then wait_for "previous stop to finish" 60 is_stopped; fi
     lightsail start-instance --instance-name "$INSTANCE" >/dev/null
     wait_for "instance to boot" 60 is_running
   fi
-  wait_for "RustDesk on $SERVER_IP:21116" 60 port_open "$SERVER_IP" 21116
+  wait_for "RustDesk on $SERVER_IP:21116" "$tries" port_open "$SERVER_IP" 21116
   echo "Server is up: $SERVER_IP"
 }
 

@@ -27,3 +27,9 @@ variable "blueprint_id" {
   type        = string
   default     = "ubuntu_24_04"
 }
+
+variable "rustdesk_server_version" {
+  description = "rustdesk/rustdesk-server Docker image tag. Only used when the server is first created."
+  type        = string
+  default     = "1.1.16"
+}
